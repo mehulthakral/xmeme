@@ -1,0 +1,305 @@
+<!DOCTYPE html> 
+<html lang="en">
+    <head>
+        <title>XMeme - Meme Stream Application</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+        <style>
+          .card{
+            padding: 10px;
+            margin: 20px;
+          }
+          .flex-container {
+            display: flex;
+            justify-content: space-around;
+          }
+          .modal-body{
+             height:150px;
+          }
+        </style>
+    </head>
+    <body>
+
+        <!-- Code for navigation bar -->
+        <nav class="navbar navbar-inverse navbar-expand-lg "> 
+            <div class="container-fluid">
+              <div class="navbar-header">
+                <a class="navbar-brand" href="#">XMeme - Meme Stream Application</a>
+              </div>
+              <ul class="nav navbar-nav navbar-right">
+                <li><a href="swagger-ui/index.html"><span class="glyphicon glyphicon-book"></span> Swagger Documentation</a></li>
+                <li><a href="https://mehulthakral-portfolio.netlify.app/"><span class="glyphicon glyphicon-user"></span> About Us</a></li>
+              </ul>
+            </div>
+        </nav>
+
+        <!-- Main Content of the page -->
+        <div class="container">
+
+            <!-- Button to open the form for submitting the meme -->
+            <button type="button" class="btn btn-info btn-block" data-toggle="collapse" data-target="#form">Add Meme</button>
+
+            <!-- Form for submitting the meme -->
+            <form class="collapse form-horizontal" id="form" onSubmit="submitMeme(event)">
+                <br>
+                <div class="form-group">
+                  <label class="control-label col-sm-2" for="name">Meme Owner:</label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control" id="name" name="name" placeholder="Enter your full name">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="control-label col-sm-2" for="caption">Caption:</label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control" id="caption" name="caption" placeholder="Be creative with the caption">
+                  </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="url">Meme URL:</label>
+                    <div class="col-sm-10">
+                      <input type="url" class="form-control" id="url" name="url" placeholder="Enter Meme URL">
+                    </div>
+                </div>
+                <div class="form-group">
+                  <div class="col-sm-offset-2 col-sm-10">
+                    <button type="submit" id="submit" class="btn btn-success">Submit</button>
+                  </div>
+                </div>
+              </form>
+              
+              <hr>
+
+              <!-- Panel for selecting number of memes to be fetched -->
+              <div class="panel panel-warning">
+                <div class="panel-heading">Memes
+                  <div class="pull-right">
+                    <select  name="count" id="count" onchange="getMemes()">
+                      <option value="5">Latest 5</option>
+                      <option value="10">Latest 10</option>
+                      <option value="50">Latest 50</option>
+                      <option value="100" selected="selected">Latest 100</option>
+                      <option value="9007199254740991">All</option>
+                    </select>
+                  </div>
+                  
+                </div>
+              </div>
+              
+              <!-- Modal to be shown when trying to edit a meme -->
+              <div id="myModal" class="modal fade" role="dialog">
+                <div class="modal-dialog modal-lg">
+              
+                  <!-- Modal content-->
+                  <div class="modal-content">
+
+                    <!-- Modal header -->
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      <h4 class="modal-title">Edit Meme</h4>
+                    </div>
+
+                    <!-- Modal body with the form to be filled when editing a meme -->
+                    <div class="modal-body">
+
+                      <div class="form-group">
+                        <label class="control-label col-sm-2" for="name">Meme Owner:</label>
+                        <div class="col-sm-10">
+                          <input type="text" class="form-control" id="edit-name" name="name" placeholder="Enter your full name" disabled>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label class="control-label col-sm-2" for="caption">Caption:</label>
+                        <div class="col-sm-10">
+                          <input type="text" class="form-control" id="edit-caption" name="caption" placeholder="Be creative with the caption">
+                        </div>
+                      </div>
+                      <div class="form-group">
+                          <label class="control-label col-sm-2" for="url">Meme URL:</label>
+                          <div class="col-sm-10">
+                            <input type="url" class="form-control" id="edit-url" name="url" placeholder="Enter Meme URL">
+                          </div>
+                      </div>
+                      <div class="form-group" style="display:none;">
+                        <label class="control-label col-sm-2" for="id">Meme ID:</label>
+                        <div class="col-sm-10">
+                          <input type="text" class="form-control" id="edit-id" name="id" placeholder="Enter Meme URL">
+                        </div>
+                    </div>
+                    </div>
+
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-primary" id="edit" data-dismiss="modal" onclick="editMeme()">Edit</button>
+                    </div>
+                  </div>
+              
+                </div>
+              </div>
+
+              <!-- Place where memes are loaded -->
+              <div id="memes">
+
+              </div>
+        </div>
+        
+    </body>
+    <script>
+        // var backend_url = "https://mehul-xmeme-backend.herokuapp.com";
+        var backend_url = "http://127.0.0.1:8081";
+
+        // Id of division to be edited
+        var div_id = "";
+
+        // Function responsible for getting memes from the backend
+        function getMemes()
+        {
+            // Ajax call to get the memes
+            $.ajax( {
+                  url:backend_url+'/memes/max/'+$("#count option:selected").val(),
+                  method:"GET",
+                  success:function(data) {
+                    $("#memes").html("");
+                    for(var i=0; i<data.length; i++)
+                    {
+                        // Code for creating the meme div
+                        var meme = document.createElement("div");
+                        meme.classList.add("col-sm-3","thumbnail","card");
+                        meme.id = data[i]["id"];
+
+                        // Adding name to div
+                        var name = document.createElement("b");
+                        name.innerHTML = data[i]["name"];
+                        name.classList.add("child-name");
+
+                        // Adding edit icon which triggers modal for editing
+                        var link = document.createElement("a");
+                        link.href = "#";
+                        link.setAttribute("data-toggle", "modal");
+                        link.setAttribute("data-target", "#myModal");
+                        link.addEventListener('click', function(){
+                            var link_id = this.children[1].innerHTML;
+                            div_id = link_id;
+                        });
+                        link.classList.add("pull-right");
+                        var icon = document.createElement("span");
+                        icon.classList.add("glyphicon", "glyphicon-edit");
+                        link.appendChild(icon);
+
+                        // Adding caption to the div
+                        var caption = document.createElement("i");
+                        caption.innerHTML = "<br>"+data[i]["caption"];
+                        caption.classList.add("child-caption");
+
+                        // Hiding meme url in div, used when tring to edit the meme 
+                        var url = document.createElement("div");
+                        url.style.display = "none";
+                        url.innerHTML = data[i]["url"];
+                        url.classList.add("child-url");
+
+                        // Hiding meme id in link, used when tring to edit the meme 
+                        var id = document.createElement("div");
+                        id.style.display = "none";
+                        id.innerHTML = data[i]["id"];
+                        id.classList.add("link-child-id");
+                        link.appendChild(id);
+
+                        // Appending elements to make the meme div
+                        meme.appendChild(name);
+                        meme.appendChild(link);
+                        meme.appendChild(caption);
+                        meme.appendChild(url);
+
+                        // Fetching img and adding to meme div
+                        var img = document.createElement("img");
+                        img.src = data[i]["url"];
+                        img.alt = data[i]["caption"];
+                        img.width = "300";
+                        img.height = "150";
+                        img.classList.add("img-responsive");
+                        meme.appendChild(img);
+
+                        $("#memes").append(meme);
+                    }
+                  },
+                  error: function(xhr, textStatus, errorThrown){
+                    console.log(textStatus);
+                  }
+            });
+        }
+
+        // Function responsible for adding a meme to the backend
+        function submitMeme(event)
+        {
+            event.preventDefault();
+            $.ajax( {
+                    url:backend_url+'/memes',
+                    data:JSON.stringify({"name":$("#name").val(),"url":$("#url").val(),"caption":$("#caption").val()}),
+                    method:"POST",
+                    contentType: "application/json",
+                    crossDomain:true,
+                    headers: {
+                        "accept": "application/json",
+                        "Access-Control-Allow-Origin":"*",
+                        "Access-Control-Allow-Headers":"*",
+                        "Access-Control-Allow-Methods":"*"
+                    },
+                    success:function(data) {
+                        getMemes();
+                    },
+                    error: function(xhr, textStatus, errorThrown){
+                        console.log(xhr.status + " " + textStatus + " " + errorThrown);
+                        if(xhr.status=="409")
+                        {
+                            alert("Submitted Meme already exists. Please try with another Meme!");
+                        }
+                    }
+                });
+        }
+
+        // Function responsible for updating meme details in the backend
+        function editMeme()
+        {
+            $.ajax( {
+                      url:backend_url+'/memes/'+$("#edit-id").val(),
+                      data:JSON.stringify({"url":$("#edit-url").val(),"caption":$("#edit-caption").val()}),
+                      method:"PATCH",
+                      // contentType: "application/json",
+                      crossDomain:true,
+                      headers: {
+                          'Content-Type' : 'application/json'
+                          // "accept": "application/text",
+                          // "Access-Control-Allow-Origin":"*",
+                          // "Access-Control-Allow-Headers":"*",
+                          // "Access-Control-Allow-Methods":"*"
+                      },
+                      success:function(data) {
+                          getMemes();
+                      },
+                      error: function(xhr, textStatus, errorThrown){
+                          console.log(textStatus + " " + errorThrown);
+                      }
+            });
+        }
+
+        // JQuery code to load the existing details of meme into the editing form
+        $(document).on('show.bs.modal', '#myModal', function (e) {
+
+            $("#edit-name").val($("#"+div_id).find(".child-name").text()); 
+            $("#edit-url").val($("#"+div_id).find(".child-url").text());
+            $("#edit-caption").val($("#"+div_id).find(".child-caption").text());
+            $("#edit-id").val(div_id);
+
+        });
+
+        // Jquery code for fetching the memes when document completes loading
+        $(function(){
+
+            getMemes();
+
+        });
+    </script>
+</html>
+

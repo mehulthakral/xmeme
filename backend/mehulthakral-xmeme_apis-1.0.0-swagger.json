@@ -1,0 +1,237 @@
+{
+  "openapi" : "3.0.0",
+  "info" : {
+    "version" : "1.0.0",
+    "title" : "XMEME API",
+    "description" : "An API that lets users to view/edit latest memes and also submit their own memes",
+    "contact" : {
+      "name" : "Mehul Thakral",
+      "url" : "https://mehulthakral-portfolio.netlify.app/",
+      "email" : "mehul.thakral@gmail.com"
+    }
+  },
+  "servers" : [ {
+    "url" : "https://mehul-xmeme-backend.herokuapp.com/",
+    "description" : "Prod Server"
+  } ],
+  "paths" : {
+    "/memes" : {
+      "get" : {
+        "description" : "Endpoint to fetch the latest 100 memes created from the backend",
+        "responses" : {
+          "200" : {
+            "description" : "Returns list of latest 100 meme objects",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "properties" : {
+                      "id" : {
+                        "type" : "string",
+                        "example" : "11"
+                      },
+                      "name" : {
+                        "type" : "string",
+                        "example" : "Online Class Student"
+                      },
+                      "url" : {
+                        "type" : "string",
+                        "example" : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ2C9zZc1z0_3a7iU4hw44BuF7ZkOFFsTmGkg&usqp=CAU"
+                      },
+                      "caption" : {
+                        "type" : "string",
+                        "example" : "Wifi Bill"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "description" : "Endpoint to send a meme to the backend",
+        "requestBody" : {
+          "required" : true,
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "object",
+                "properties" : {
+                  "name" : {
+                    "type" : "string",
+                    "example" : "Online Class Student"
+                  },
+                  "url" : {
+                    "type" : "string",
+                    "example" : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ2C9zZc1z0_3a7iU4hw44BuF7ZkOFFsTmGkg&usqp=CAU"
+                  },
+                  "caption" : {
+                    "type" : "string",
+                    "example" : "Wifi Bill"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Returns allocated unique id for the meme",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "id" : {
+                      "type" : "string",
+                      "example" : "11"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/memes/{id}" : {
+      "get" : {
+        "description" : "Endpoint to specify a particular id (identifying the meme) to fetch a single Meme",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "description" : "ID of meme to be fetched",
+          "schema" : {
+            "type" : "integer",
+            "example" : 11
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Returns allocated unique id for the meme",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "id" : {
+                      "type" : "string",
+                      "example" : "11"
+                    },
+                    "name" : {
+                      "type" : "string",
+                      "example" : "Online Class Student"
+                    },
+                    "url" : {
+                      "type" : "string",
+                      "example" : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ2C9zZc1z0_3a7iU4hw44BuF7ZkOFFsTmGkg&usqp=CAU"
+                    },
+                    "caption" : {
+                      "type" : "string",
+                      "example" : "Wifi Bill"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "No meme found"
+          }
+        }
+      },
+      "patch" : {
+        "description" : "Endpoint to update the caption or url for an existing meme at the backend",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "description" : "ID of meme to be fetched",
+          "schema" : {
+            "type" : "integer",
+            "example" : 11
+          }
+        } ],
+        "requestBody" : {
+          "required" : true,
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "object",
+                "properties" : {
+                  "url" : {
+                    "type" : "string",
+                    "example" : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ2C9zZc1z0_3a7iU4hw44BuF7ZkOFFsTmGkg&usqp=CAU"
+                  },
+                  "caption" : {
+                    "type" : "string",
+                    "example" : "Wifi Bill"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Updated successfully"
+          },
+          "400" : {
+            "description" : "No meme found"
+          }
+        }
+      }
+    },
+    "/memes/max/{count}" : {
+      "get" : {
+        "description" : "Endpoint to fetch the latest maximum count number of memes created from the backend",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "count",
+          "required" : true,
+          "description" : "Maximum number of memes to be fetched",
+          "schema" : {
+            "type" : "integer",
+            "example" : 10
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Returns list of latest maximum count number of meme objects",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "properties" : {
+                      "id" : {
+                        "type" : "string",
+                        "example" : "11"
+                      },
+                      "name" : {
+                        "type" : "string",
+                        "example" : "Online Class Student"
+                      },
+                      "url" : {
+                        "type" : "string",
+                        "example" : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ2C9zZc1z0_3a7iU4hw44BuF7ZkOFFsTmGkg&usqp=CAU"
+                      },
+                      "caption" : {
+                        "type" : "string",
+                        "example" : "Wifi Bill"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
