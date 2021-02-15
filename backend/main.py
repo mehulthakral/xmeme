@@ -8,7 +8,7 @@ import requests
 
 # db = pymysql.connect(host="us-cdbr-east-03.cleardb.com", user="b163ecafb050c5", password="67c0858d", db="heroku_82df1ddd3b24563")
 
-db = pymysql.connect(host="localhost", user="root", password="", db="xmeme", port=3307)
+db = pymysql.connect(host="localhost", user="root", password="", db="xmeme", port=3306)
 # Also comment db in read and write fns
 
 app = Flask(__name__)

@@ -2,6 +2,6 @@
 
 cd backend
 
-python main.py &
+python3 main.py &
 
-python main_swagger.py &
+python3 main_swagger.py &
