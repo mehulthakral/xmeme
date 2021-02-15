@@ -23,3 +23,5 @@ A Full Stack Application for storing and retrieving memes - <a href="https://meh
       <li><code>curl --location --request GET 'http://localhost:8080/swagger-ui/'</code> - Will fetch Swagger API documentation in JSON format - can be used for backend requests</li>
     </ol>
   </li>
+  <li><code>sudo docker-compose up --build</code> - To run backend using docker</li>
+</ol>

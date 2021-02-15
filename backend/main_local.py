@@ -3,13 +3,12 @@ from flask_cors import CORS, cross_origin
 import random
 import pymysql
 import requests
-import os
 
 # Option to choose db - cloud db or on localhost
 
 # db = pymysql.connect(host="us-cdbr-east-03.cleardb.com", user="b163ecafb050c5", password="67c0858d", db="heroku_82df1ddd3b24563")
 
-# db = pymysql.connect(host="localhost", user="root", password="", db="xmeme", port=3306)
+db = pymysql.connect(host="localhost", user="root", password="", db="xmeme", port=3306)
 # Also comment db in read and write fns
 
 app = Flask(__name__)
@@ -19,7 +18,7 @@ CORS(app,allow_headers='*',origins='*')
 
 # Option to choose backend - heroku or localhost
 # backend_url = "https://mehul-xmeme-backend.herokuapp.com"
-backend_url = "http://localhost:80"
+backend_url = "http://localhost:8081"
 
 def _build_cors_prelight_response():
     response = make_response()
@@ -151,7 +150,6 @@ def write_db():
 
     json = request.get_json()
     # db = pymysql.connect(host="us-cdbr-east-03.cleardb.com", user="b163ecafb050c5", password="67c0858d", db="heroku_82df1ddd3b24563")
-    db = pymysql.connect(host="db_xmeme", user="root", password="123", db="xmeme", port=3306)
     cur = db.cursor()
 
     if(json["type"]=="insert"):
@@ -193,7 +191,6 @@ def read_db():
 
     json = request.get_json()
     # db = pymysql.connect(host="us-cdbr-east-03.cleardb.com", user="b163ecafb050c5", password="67c0858d", db="heroku_82df1ddd3b24563")
-    db = pymysql.connect(host="db_xmeme", user="root", password="123", db="xmeme", port=3306)
     cur = db.cursor()
     
     columns = json["columns"][0]
