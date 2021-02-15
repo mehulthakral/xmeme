@@ -139,7 +139,7 @@
               }
             }
           },
-          "400" : {
+          "404" : {
             "description" : "No meme found"
           }
         }
@@ -180,7 +180,7 @@
           "200" : {
             "description" : "Updated successfully"
           },
-          "400" : {
+          "404" : {
             "description" : "No meme found"
           }
         }
